@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HGDB-LRUPS • Comparison</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css?v=9"/>
+</head>
+<body>
+<header class="top">
+  <div class="brand">HGDB-LRUPS <small>Comparison</small></div>
+  <nav class="nav">
+    <a href="index.html">Overview</a>
+    <a href="simulator.html">Simulator</a>
+    <a href="mechanisms.html">Mechanisms</a>
+    <a class="active" href="comparison.html">Comparison</a>
+    <a href="equations.html">Equations</a>
+  </nav>
+</header>
+<main class="container">
+  <section class="card">
+    <h2>Algorithm Comparison on Same Input</h2>
+    <p>This page runs the same saved workload and parameters across <b>HGDB-LRUPS, LRU, ARC, RRIP</b>.</p>
+    <div class="row">
+      <button id="btnRunCompare" class="btn primary">Run/Refresh Comparison</button>
+      <a href="simulator.html" class="btn">Edit Inputs</a>
+    </div>
+  </section>
+
+  <section class="grid-4" id="cards" style="margin-top:1rem"></section>
+
+  <section class="grid-2" style="margin-top:1rem">
+    <article class="card">
+      <h3>Quality Comparison</h3>
+      <canvas id="barChart" width="1000" height="380"></canvas>
+      <div class="chart-legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:#34e3b2"></span> Green bars = Hit Rate (%)</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#22b7ff"></span> Blue bars = Weighted Miss Cost</div>
+      </div>
+      <p class="axis-note">
+        X-axis: Algorithms (HGDB, LRU, ARC, RRIP).<br>
+        Y-axis: normalized bar height per metric (actual values are printed above each bar and in cards).
+      </p>
+    </article>
+    <article class="card">
+      <h3>HGDB Adaptation Signals</h3>
+      <canvas id="lineChart" width="1000" height="380"></canvas>
+      <div class="chart-legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:#34e3b2"></span> Teal line = Confidence (Conf_t)</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#ffcc66"></span> Yellow line = Adaptive look-ahead (k_t)</div>
+      </div>
+      <p class="axis-note">
+        X-axis: Request step (time).<br>
+        Y-axis: normalized signal level (confidence in [0,1], and k_t scaled by current max k for plotting).
+      </p>
+    </article>
+  </section>
+
+  <section class="card" style="margin-top:1rem">
+    <h2>Complexity and Efficiency Interpretation</h2>
+    <table>
+      <thead><tr><th>Algorithm</th><th>Time Complexity</th><th>Interpretation</th></tr></thead>
+      <tbody>
+        <tr><td>LRU</td><td>O(1) per access</td><td>Lowest overhead, no cost/priority awareness.</td></tr>
+        <tr><td>ARC (simplified)</td><td>O(1) amortized</td><td>Adaptive recency/frequency balancing.</td></tr>
+        <tr><td>RRIP (simplified)</td><td>O(1) amortized</td><td>Prediction-style insertion/eviction counters.</td></tr>
+        <tr><td>HGDB-LRUPS</td><td>Hit O(1), Eviction O(B_p·k_t), Rebalance O(P·C²)</td><td>Higher control cost, better weighted-miss and priority protection potential.</td></tr>
+      </tbody>
+    </table>
+  </section>
+</main>
+<footer class="foot">Comparison reflects computed values only (no static benchmark injection).</footer>
+<script src="core.js?v=9"></script>
+<script src="comparison.js?v=9"></script>
+</body>
+</html>

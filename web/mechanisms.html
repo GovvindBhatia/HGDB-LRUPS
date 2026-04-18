@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HGDB-LRUPS • Mechanisms</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css?v=9"/>
+</head>
+<body>
+<header class="top">
+  <div class="brand">HGDB-LRUPS <small>Mechanisms</small></div>
+  <nav class="nav">
+    <a href="index.html">Overview</a>
+    <a href="simulator.html">Simulator</a>
+    <a class="active" href="mechanisms.html">Mechanisms</a>
+    <a href="comparison.html">Comparison</a>
+    <a href="equations.html">Equations</a>
+  </nav>
+</header>
+<main class="container">
+  <section class="grid-2">
+    <article class="card">
+      <h2>Live Mechanism Player</h2>
+      <p>This panel replays the latest simulator run and highlights exactly how a request moves through the workflow.</p>
+      <div class="row">
+        <button id="btnPrev" class="btn">Prev Step</button>
+        <button id="btnNext" class="btn primary">Next Step</button>
+        <button id="btnAuto" class="btn">Auto Play</button>
+        <a href="simulator.html" class="btn">Back to Simulator</a>
+      </div>
+      <div class="pipeline" id="pipeline" style="margin-top:.8rem">
+        <div class="node" data-node="lookup">Lookup/HIT-MISS</div>
+        <div class="node" data-node="prs">Tier1 PRS</div>
+        <div class="node" data-node="conf">Confidence</div>
+        <div class="node" data-node="evict">Tier2 Evict</div>
+        <div class="node" data-node="ghost">Ghost Cache</div>
+        <div class="node" data-node="rebalance">Tier3 Rebalance</div>
+        <div class="node" data-node="done">Output</div>
+      </div>
+      <div class="kpi" style="margin-top:.8rem">
+        <div class="tile"><div class="v" id="mStep">0</div><div class="l">Current Step</div></div>
+        <div class="tile"><div class="v" id="mReq">-</div><div class="l">Request</div></div>
+        <div class="tile"><div class="v" id="mConf">-</div><div class="l">Confidence</div></div>
+        <div class="tile"><div class="v" id="mK">-</div><div class="l">k_t</div></div>
+      </div>
+      <div id="mechanismLog" class="log" style="margin-top:.8rem"></div>
+    </article>
+
+    <article class="card">
+      <h2>Hit/Miss + Ghost Live Diagram</h2>
+      <canvas id="mechanismCanvas" width="900" height="500"></canvas>
+      <p class="callout" id="mechanismNarrative">Run simulator first. This page will animate hit/miss and ghost-cache effects from real timeline events.</p>
+    </article>
+  </section>
+</main>
+<footer class="foot">Mechanism replay uses authentic timeline from latest simulator run.</footer>
+<script src="core.js?v=9"></script>
+<script src="mechanisms.js?v=9"></script>
+</body>
+</html>

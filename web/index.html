@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HGDB-LRUPS • Overview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css?v=9"/>
+</head>
+<body>
+<header class="top">
+  <div class="brand">HGDB-LRUPS <small>Demo Suite</small></div>
+  <nav class="nav">
+    <a class="active" href="index.html">Overview</a>
+    <a href="simulator.html">Simulator</a>
+    <a href="mechanisms.html">Mechanisms</a>
+    <a href="comparison.html">Comparison</a>
+    <a href="equations.html">Equations</a>
+  </nav>
+</header>
+<main class="container">
+  <section class="hero">
+    <article class="card">
+      <span class="badge">Professional Demonstration Build</span>
+      <h1>Hybrid Greedy + DP Cache Scheduling</h1>
+      <p>This multi-page website demonstrates the complete HGDB-LRUPS workflow with live request-level execution, baseline replay (LRU/ARC/RRIP), and equation-linked explainability.</p>
+      <div class="row">
+        <a class="btn primary" href="simulator.html">Open Live Simulator</a>
+        <a class="btn" href="mechanisms.html">View Mechanisms</a>
+      </div>
+    </article>
+    <article class="card">
+      <h3>What This Site Shows</h3>
+      <ul>
+        <li>How data enters and moves through Tier 1, Tier 2, Tier 3.</li>
+        <li>When hit/miss occurs and how eviction victim is selected.</li>
+        <li>How ghost cache tags and confidence affect adaptation.</li>
+        <li>Side-by-side metrics against current baseline algorithms.</li>
+      </ul>
+      <p class="callout">Start from <b>Simulator</b>, then open <b>Comparison</b> to evaluate the same input across all algorithms.</p>
+    </article>
+  </section>
+
+  <section class="grid-3" style="margin-top:1rem">
+    <article class="card"><h3>Page 1: Simulator</h3><p>Input parameters and trace, run step-by-step or run-all, inspect budgets, cache state, ghost state, and timeline logs.</p><a class="btn" href="simulator.html">Go</a></article>
+    <article class="card"><h3>Page 2: Mechanisms</h3><p>Live mechanism diagram that animates stage transitions for hit, miss, ghost-hit, and rebalance events.</p><a class="btn" href="mechanisms.html">Go</a></article>
+    <article class="card"><h3>Page 3: Comparison</h3><p>Use the same trace to compare HGDB vs LRU/ARC/RRIP on hit-rate, weighted miss-cost, evictions, and operation proxy.</p><a class="btn" href="comparison.html">Go</a></article>
+  </section>
+
+  <section class="grid-2" style="margin-top:1rem">
+    <article class="card"><h3>Page 4: Equations & Symbols</h3><p>All formulas from your manuscript with plain-language mapping and symbol glossary.</p><a class="btn" href="equations.html">Go</a></article>
+    <article class="card"><h3>Export</h3><p>Generate JSON report from simulator/comparison with full input, output, and metrics for presentation backup.</p><a class="btn" href="simulator.html#export">Go</a></article>
+  </section>
+</main>
+<footer class="foot">HGDB-LRUPS Demo Suite • Local deterministic simulation</footer>
+</body>
+</html>

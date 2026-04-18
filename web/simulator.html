@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HGDB-LRUPS • Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css?v=9"/>
+</head>
+<body>
+<header class="top">
+  <div class="brand">HGDB-LRUPS <small>Simulator</small></div>
+  <nav class="nav">
+    <a href="index.html">Overview</a>
+    <a class="active" href="simulator.html">Simulator</a>
+    <a href="mechanisms.html">Mechanisms</a>
+    <a href="comparison.html">Comparison</a>
+    <a href="equations.html">Equations</a>
+  </nav>
+</header>
+<main class="container">
+  <section class="grid-2">
+    <article class="card">
+      <h2>Inputs</h2>
+      <div class="form">
+        <label><span class="label-head">C <span class="sym" data-tip="Total cache capacity. Higher C means more objects can stay in cache before eviction starts.">?</span></span><input id="cfgC" type="number" value="8" min="2"></label>
+        <label><span class="label-head">P <span class="sym" data-tip="Number of priority classes. Cache is split into P partitions, then rebalanced over time.">?</span></span><input id="cfgP" type="number" value="3" min="1"></label>
+        <label><span class="label-head">N <span class="sym" data-tip="Total requests to simulate from the workload box. More N gives more stable comparison results.">?</span></span><input id="cfgN" type="number" value="45" min="1"></label>
+        <label><span class="label-head">k_min <span class="sym" data-tip="Minimum look-ahead depth in Tier 2. Even at low confidence, planner looks at least k_min steps.">?</span></span><input id="cfgKmin" type="number" value="1" min="1"></label>
+        <label><span class="label-head">k_max <span class="sym" data-tip="Maximum look-ahead depth. Actual k_t moves between k_min and k_max based on confidence.">?</span></span><input id="cfgKmax" type="number" value="5" min="1"></label>
+        <label><span class="label-head">rho <span class="sym" data-tip="Confidence smoothing (EMA). Higher rho = slower, steadier confidence updates; lower rho = faster, noisier reaction.">?</span></span><input id="cfgRho" type="number" value="0.75" step="0.05" min="0" max="0.99"></label>
+        <label><span class="label-head">theta <span class="sym" data-tip="PRS admission threshold. If PRS is below theta, miss is served but object is not inserted (bypass).">?</span></span><input id="cfgTheta" type="number" value="0.30" step="0.05" min="0" max="1"></label>
+        <label><span class="label-head">alpha <span class="sym" data-tip="PRS weight for recency. Increase alpha to favor recently seen objects.">?</span></span><input id="cfgA" type="number" value="0.25" step="0.05"></label>
+        <label><span class="label-head">beta <span class="sym" data-tip="PRS weight for frequency. Increase beta to favor repeatedly requested objects.">?</span></span><input id="cfgB" type="number" value="0.20" step="0.05"></label>
+        <label><span class="label-head">gamma <span class="sym" data-tip="PRS weight for miss cost. Increase gamma to protect expensive-to-miss objects.">?</span></span><input id="cfgG" type="number" value="0.35" step="0.05"></label>
+        <label><span class="label-head">delta <span class="sym" data-tip="PRS weight for priority. Increase delta to protect high-priority classes.">?</span></span><input id="cfgD" type="number" value="0.25" step="0.05"></label>
+        <label><span class="label-head">rebalanceEvery <span class="sym" data-tip="How often Tier 3 runs knapsack-DP. Smaller value = faster adaptation but more control overhead.">?</span></span><input id="cfgReb" type="number" value="6" min="1"></label>
+      </div>
+      <h3>Workload (id,class,priority,cost)</h3>
+      <p class="axis-note">
+        <b>Symbols:</b> <code>id</code> = object id, <code>class</code> = priority class index,
+        <code>priority</code> = logical importance level, <code>cost</code> = weighted miss penalty.
+      </p>
+      <div class="row">
+        <button id="genStable" class="btn">Generate Stable</button>
+        <button id="genScan" class="btn">Generate Scan Burst</button>
+        <button id="genDrift" class="btn">Generate Drift</button>
+      </div>
+      <textarea id="workload"></textarea>
+      <div class="row">
+        <button id="btnReset" class="btn">Reset</button>
+        <button id="btnStep" class="btn">Step</button>
+        <button id="btnRun" class="btn primary">Run All</button>
+        <a class="btn" href="comparison.html">Open Comparison</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <h2>Live Output</h2>
+      <div class="kpi">
+        <div class="tile"><div class="v" id="kHitRate">0%</div><div class="l">Hit Rate</div></div>
+        <div class="tile"><div class="v" id="kCost">0</div><div class="l">Weighted Miss Cost</div></div>
+        <div class="tile"><div class="v" id="kConf">1.00</div><div class="l">Confidence</div></div>
+        <div class="tile"><div class="v" id="kKt">-</div><div class="l">Adaptive k</div></div>
+      </div>
+      <div class="kpi" style="margin-top:.55rem">
+        <div class="tile"><div class="v" id="kEvict">0</div><div class="l">Evictions</div></div>
+        <div class="tile"><div class="v" id="kGhostHits">0</div><div class="l">Ghost Hits</div></div>
+        <div class="tile"><div class="v" id="kIdx">0/0</div><div class="l">Processed</div></div>
+        <div class="tile"><div class="v" id="kMiss">0</div><div class="l">Misses</div></div>
+      </div>
+      <div class="chips" id="budgetChips" style="margin:.7rem 0"></div>
+      <div id="stateView"></div>
+      <h3>Step Timeline</h3>
+      <div class="pipeline" id="pipeline">
+        <div class="node" data-node="lookup">Lookup</div>
+        <div class="node" data-node="prs">PRS</div>
+        <div class="node" data-node="conf">Confidence</div>
+        <div class="node" data-node="evict">Eviction</div>
+        <div class="node" data-node="ghost">Ghost</div>
+        <div class="node" data-node="rebalance">Rebalance</div>
+        <div class="node" data-node="done">Done</div>
+      </div>
+      <div id="log" class="log" style="margin-top:.6rem"></div>
+    </article>
+  </section>
+
+  <section id="export" class="card" style="margin-top:1rem">
+    <h2>Export / Report</h2>
+    <p>Download full run bundle (config + workload + HGDB timeline + baseline comparison) as JSON.</p>
+    <button id="btnExport" class="btn primary">Download Report JSON</button>
+  </section>
+</main>
+<footer class="foot">Use same saved run in Mechanisms and Comparison pages.</footer>
+<script src="core.js?v=9"></script>
+<script src="simulator.js?v=9"></script>
+</body>
+</html>

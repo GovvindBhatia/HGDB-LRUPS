@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HGDB-LRUPS • Equations & Symbols</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css?v=9"/>
+</head>
+<body>
+<header class="top">
+  <div class="brand">HGDB-LRUPS <small>Equations</small></div>
+  <nav class="nav">
+    <a href="index.html">Overview</a>
+    <a href="simulator.html">Simulator</a>
+    <a href="mechanisms.html">Mechanisms</a>
+    <a href="comparison.html">Comparison</a>
+    <a class="active" href="equations.html">Equations</a>
+  </nav>
+</header>
+<main class="container">
+  <section class="card">
+    <h2>Equation Studio (Expanded)</h2>
+    <p>Only the most important equations used directly in Tier 1, Tier 2, and Tier 3 are shown here in simpler form.</p>
+  </section>
+
+  <section class="grid-2" style="margin-top:1rem">
+    <article class="card">
+      <h3>Tier 1: PRS Admission</h3>
+      <p><code>PRS = αD + βf̃ + γc̃ + δp̃; admit if PRS ≥ θ_t</code></p>
+      <p><b>What it does:</b> This is the admission gate. On every miss, the object gets one combined score. If the score is high enough, the object is inserted into cache. If not, it is bypassed to avoid pollution.</p>
+      <p><b>Why required:</b> Without this gate, low-value objects can enter cache and evict better objects.</p>
+      <p><b>Symbols:</b></p>
+      <ul>
+        <li><code>PRS</code>: Priority-Relevance Score for current object.</li>
+        <li><code>α, β, γ, δ</code>: weights for recency, frequency, miss cost, and priority terms.</li>
+        <li><code>D</code>: recency-decay component (recently used items get better value).</li>
+        <li><code>f̃</code>: normalized frequency term.</li>
+        <li><code>c̃</code>: normalized miss-cost term.</li>
+        <li><code>p̃</code>: normalized priority term.</li>
+        <li><code>θ_t</code>: threshold at time <code>t</code> used to accept/reject admission.</li>
+      </ul>
+    </article>
+    <article class="card">
+      <h3>Tier 2: Confidence Update</h3>
+      <p><code>Conf_t = ρ·Conf_{t−1} + (1−ρ)·a_t</code></p>
+      <p><b>What it does:</b> Updates trust in the predictor using a smoothed average. It combines old confidence and current prediction correctness.</p>
+      <p><b>Why required:</b> Prevents unstable “jumping” decisions from one good/bad prediction.</p>
+      <p><b>Symbols:</b></p>
+      <ul>
+        <li><code>Conf_t</code>: confidence at current time step.</li>
+        <li><code>Conf_{t−1}</code>: previous confidence value.</li>
+        <li><code>ρ</code>: smoothing factor (higher = slower changes, lower = faster changes).</li>
+        <li><code>a_t</code>: current prediction accuracy signal (typically 0 or 1).</li>
+      </ul>
+    </article>
+    <article class="card">
+      <h3>Tier 2: Adaptive Look-ahead</h3>
+      <p><code>k_t = max(k_min, floor(k_max · Conf_t))</code></p>
+      <p><b>What it does:</b> Sets how far ahead the eviction planner looks. High confidence gives larger look-ahead; low confidence keeps it short.</p>
+      <p><b>Why required:</b> Makes predictive planning safe under drift.</p>
+      <p><b>Symbols:</b></p>
+      <ul>
+        <li><code>k_t</code>: active look-ahead depth at time <code>t</code>.</li>
+        <li><code>k_min</code>: minimum allowed look-ahead depth.</li>
+        <li><code>k_max</code>: maximum allowed look-ahead depth.</li>
+        <li><code>Conf_t</code>: current predictor confidence.</li>
+        <li><code>floor()</code>: rounds down to integer.</li>
+      </ul>
+    </article>
+    <article class="card">
+      <h3>Tier 2: Blended Eviction</h3>
+      <p><code>Score_i = (1−λ_g)L̂_i + λ_g·GreedyRisk_i, λ_g = 1−Conf_t</code></p>
+      <p><b>What it does:</b> Gives each eviction candidate <code>i</code> one final score using predictive and greedy terms. Candidate with best score is selected as victim.</p>
+      <p><b>Why required:</b> If prediction is unreliable, the model automatically shifts toward safer greedy behavior.</p>
+      <p><b>Symbols:</b></p>
+      <ul>
+        <li><code>Score_i</code>: final eviction score for candidate <code>i</code>.</li>
+        <li><code>L̂_i</code>: predictive regret/cost estimate for evicting <code>i</code>.</li>
+        <li><code>GreedyRisk_i</code>: local heuristic risk term for candidate <code>i</code>.</li>
+        <li><code>λ_g</code>: greedy blending weight.</li>
+        <li><code>Conf_t</code>: confidence that controls <code>λ_g</code>.</li>
+      </ul>
+    </article>
+    <article class="card">
+      <h3>Tier 3: Knapsack-DP Rebalance</h3>
+      <p><code>F[p][c] = max_{0≤x≤c}(F[p−1][c−x] + U_p(x))</code></p>
+      <p><b>What it does:</b> Computes best integer cache budget split across classes under total capacity constraint.</p>
+      <p><b>Why required:</b> Systematically reallocates class budgets when workload pressure changes.</p>
+      <p><b>Symbols:</b></p>
+      <ul>
+        <li><code>F[p][c]</code>: best utility using first <code>p</code> classes with total capacity <code>c</code>.</li>
+        <li><code>x</code>: capacity assigned to class <code>p</code> in current DP choice.</li>
+        <li><code>U_p(x)</code>: utility of giving class <code>p</code> budget <code>x</code>.</li>
+        <li><code>max</code>: selects best allocation choice.</li>
+      </ul>
+    </article>
+    <article class="card">
+      <h3>Global Objective (Evaluation)</h3>
+      <p><code>min_π E[ Σ c_{r_t} · 1[r_t ∉ S^π(t−1)] ]</code></p>
+      <p><b>What it does:</b> Defines what “better” means for the full system: minimize total weighted miss penalty over all requests.</p>
+      <p><b>Why required:</b> Your project optimizes expensive misses, not just raw miss count.</p>
+      <p><b>Symbols:</b></p>
+      <ul>
+        <li><code>π</code>: cache policy.</li>
+        <li><code>E[ ]</code>: expectation (average behavior).</li>
+        <li><code>Σ</code>: sum over all request steps.</li>
+        <li><code>c_{r_t}</code>: miss cost of request at time <code>t</code>.</li>
+        <li><code>1[ ]</code>: indicator (1 if miss, 0 if hit).</li>
+        <li><code>S^π(t−1)</code>: cache state before request <code>t</code> under policy <code>π</code>.</li>
+      </ul>
+    </article>
+  </section>
+
+  <section class="card" style="margin-top:1rem">
+    <h2>Symbol Glossary</h2>
+    <table>
+      <thead><tr><th>Symbol</th><th>Simple Meaning</th><th>Where Used</th></tr></thead>
+      <tbody>
+        <tr><td>PRS</td><td>Priority-Relevance Score used for admission</td><td>Tier 1</td></tr>
+        <tr><td>θ_t</td><td>minimum PRS required to admit a miss</td><td>Tier 1</td></tr>
+        <tr><td>Conf_t</td><td>predictor confidence in [0,1]</td><td>Tier 2</td></tr>
+        <tr><td>k_t</td><td>look-ahead depth at time t</td><td>Tier 2</td></tr>
+        <tr><td>λ_g</td><td>greedy fallback weight (1-Conf_t)</td><td>Tier 2</td></tr>
+        <tr><td>B_p</td><td>allocated cache budget for class p</td><td>Tier 3</td></tr>
+        <tr><td>U_p(x)</td><td>utility if class p receives budget x</td><td>Tier 3</td></tr>
+        <tr><td>C</td><td>total cache capacity</td><td>Global + Tier 3</td></tr>
+      </tbody>
+    </table>
+  </section>
+</main>
+<footer class="foot">Equation page is intentionally explainable for viva presentation.</footer>
+<script src="core.js?v=9"></script>
+</body>
+</html>
